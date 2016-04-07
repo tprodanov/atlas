@@ -30,7 +30,7 @@ def trim_from_left_edge(read, amplicon):
     return best_score, read[:best_read_end]
 
 
-def trim(read, amplicon, reversed_amplicon):
+def trim_to_amplicon(read, amplicon, reversed_amplicon):
     score, trimmed_read = trim_from_left_edge(read, amplicon)
 
     reversed_read = ''.join(reversed(read))
@@ -53,6 +53,40 @@ def trim(read, amplicon, reversed_amplicon):
 
     trimmed_read = ''.join(trimmed_read)
     return score, trimmed_read
+
+
+def possible_amplicons(read, amplicon_index, k):
+    l = len(read)
+    if l >= 2 * k:
+        kmer_pos = [# 0,
+                    k,
+                    int(l / 2 - k / 2),
+                    l - 2 * k,
+                    # l - k
+        ]
+    elif l >= k:
+        kmer_pos = [0, l - k]
+    else:
+        return []
+
+    all_amplicons = []
+    was_N = []
+    for pos in kmer_pos:
+        kmer = nt_string.count_kmer(read, pos, k)
+        if kmer == -1:
+            was_N.append(pos)
+        else:
+            for a in amplicon_index.get_all_amplicons(kmer):
+                all_amplicons.append(a)
+    if not all_amplicons and was_N:
+        for pos in was_N:
+            kmers = nt_string.count_kmer_extend_n(read, pos, k)
+            if not kmers:
+                continue
+            for kmer in kmers:
+                for a in amplicon_index.get_all_amplicons(kmer):
+                    all_amplicons.append(a)
+    return all_amplicons
 
 
 def main():
