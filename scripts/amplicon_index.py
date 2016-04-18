@@ -10,16 +10,16 @@ class AmpliconIndex:
         self.__modulo = 4 ** (k - 1)
 
         self.__kmer_dict = dict()
-        amplicon_number = 0
-        for amplicon, r_amplicon in amplicons:
+        amplicon_number = 1
+        for amplicon, rc_amplicon in amplicons:
             self.__add_amplicon(amplicon, amplicon_number)
-            self.__add_amplicon(r_amplicon, amplicon_number)
+            self.__add_amplicon(rc_amplicon, -amplicon_number)
             amplicon_number += 1
 
     def __add_amplicon(self, amplicon, amplicon_number):
         amplicon_iter = iter(amplicon)
         i = 1
-        kmer = 1
+        kmer = 0
         for nt in amplicon_iter:
             kmer = 4 * kmer + nt_string.nt_number[nt]
             i += 1
@@ -30,9 +30,11 @@ class AmpliconIndex:
             kmer = (kmer % self.__modulo) * 4 + nt_string.nt_number[nt]
 
             if kmer in self.__kmer_dict:
-                self.__kmer_dict[kmer].append(amplicon_number)
+                self.__kmer_dict[kmer].add(amplicon_number)
             else:
-                self.__kmer_dict[kmer] = set(amplicon_number)
+                new_set = set()
+                new_set.add(amplicon_number)
+                self.__kmer_dict[kmer] = new_set
 
     def get_all_amplicons(self, kmer):
         return self.__kmer_dict[kmer] if kmer in self.__kmer_dict else []

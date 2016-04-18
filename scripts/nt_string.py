@@ -1,18 +1,25 @@
 
 
+class FastaRead:
+    def __init__(self, name, seq):
+        self.name = name
+        self.seq = seq
+
+    def __str__(self):
+        return '%s\n%s\n' % (self.name, self.seq)
+
+
 def read_fasta(f):
     name = next(f).strip()
     current_sequence = []
-    sequences = []
     for line in f:
         if line[0] == '>':
-            sequences.append((name, ''.join(current_sequence)))
+            yield FastaRead(name, ''.join(current_sequence))
             current_sequence = []
             name = line.strip()
         else:
             current_sequence.append(line.strip())
-    sequences.append((name, ''.join(current_sequence)))
-    return sequences
+    yield FastaRead(name, ''.join(current_sequence))
 
 
 class FastqRead:
@@ -34,13 +41,8 @@ class FastqRead:
 
 
 def read_fastq(f):
-    reads = []
-    try:
-        while True:
-            reads.append(FastqRead.from_file(f))
-    except StopIteration:
-        pass
-    return reads
+    while True:
+        yield FastqRead.from_file(f)
 
 
 class UnexpectedLetter(Exception):
@@ -71,7 +73,7 @@ def count_kmer_extend_n(seq, start, k):
     for i in range(start, start + k):
         if seq[i] == 'N':  # TODO: What to do when N
             if len(n_positions) == 2:
-                return None
+                return []
             n_positions.append(i - start)
         else:
             kmer = kmer * 4 + nt_number[seq[i]]
