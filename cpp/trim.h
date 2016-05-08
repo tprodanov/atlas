@@ -9,14 +9,20 @@ namespace atlas {
 
 struct trim_parameters {
 
-    static int score_threshold;
+    static float score_threshold_ratio;
     static float gap_penalty;
     static float mismatch_penalty;
 
 };
 
-size_t align_from_the_left(std::string const& seq, std::string const& amplicon, float& score);
-size_t align_from_the_right(std::string const& seq, std::string const& amplicon, float& score);
+enum direction {
+    stop = 0,
+    up,
+    diagonal,
+    left
+};
+
+size_t find_start(direction* prev, size_t coord, size_t n);
 float trim_to_amplicon(std::string const& seq, std::string const& amplicon, size_t& left, size_t& right);
 
 std::set<int> possible_amplicons(std::string const& seq,
@@ -30,5 +36,8 @@ void trim(amplicon_index const& ai, amplicon_pairs const& amplicons,
           std::istream& fastq1,  std::istream& fastq2,
           std::ostream& output1, std::ostream& output2,
           std::ostream& error1,  std::ostream& error2);
+
+void trim_sam(amplicon_index const& ai, amplicon_pairs const& amplicons,
+              std::istream& in, std::ostream& out, std::ostream& err);
 
 } // namespace atlas

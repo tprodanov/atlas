@@ -10,9 +10,11 @@
 
 namespace atlas {
 
+using amplicon_pairs = std::vector<std::pair<std::string, std::string>>;
+
 struct amplicon_index {
 
-    amplicon_index(std::vector<std::pair<std::string, std::string>> const& amplicons, size_t k);
+    amplicon_index(amplicon_pairs const& amplicons, size_t k);
     amplicon_index(std::istream& in);
     bool contains(u64 kmer) const;
     std::set<int> const& get_all_amplicons(u64 kmer) const;
@@ -30,7 +32,6 @@ private:
 
 };
 
-using amplicon_pairs = std::vector<std::pair<std::string, std::string>>;
 amplicon_pairs create_amplicon_pairs(std::istream& in);
 
 } // namespace atlas

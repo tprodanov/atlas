@@ -2,7 +2,7 @@
 
 namespace atlas {
 
-amplicon_index::amplicon_index(std::vector<std::pair<std::string, std::string>> const& amplicons, size_t k) {
+amplicon_index::amplicon_index(amplicon_pairs const& amplicons, size_t k) {
     k_ = k;
     modulo_ = 1;
     for (size_t i = 1; i < k_; ++i) {
@@ -80,8 +80,8 @@ void amplicon_index::save(std::ostream& out) const {
 
 amplicon_pairs create_amplicon_pairs(std::istream& amplicons_stream) {
     amplicon_pairs pairs;
-    for (read const& read : read_fasta(amplicons_stream)) {
-        pairs.push_back(std::make_pair(read.get_seq(), reverse_complement(read.get_seq())));
+    for (read const& r : read_fasta(amplicons_stream)) {
+        pairs.push_back(std::make_pair(r.get_seq(), reverse_complement(r.get_seq())));
     }
     return pairs;
 }
