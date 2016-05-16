@@ -37,7 +37,7 @@ void trim_fq2(atlas::parse_args const& parser, atlas::amplicon_pairs const& ampl
     std::ostream *error1_stream = parser.get_ostream("e", "<err1.fq>", 1, output1_stream);
     std::ostream *error2_stream = parser.get_ostream("e", "<err2.fq>", 2, output2_stream);
 
-    atlas::trim(amplicon_index, amplicons,
+    atlas::trim_fastq(amplicon_index, amplicons,
                 *fastq1_stream, *fastq2_stream,
                 *output1_stream, *output2_stream,
                 *error1_stream, *error2_stream);
@@ -83,23 +83,25 @@ Usage:
     .fq indicates fastq format
     .sam indicates sam format
 
-    <ampl.fa>       Amplicons
-    <in.*>          File with unpaired reads (default: stdin)
-    <in1.*>         File with #1 mates
-    <in2.*>         File with #2 mates
+    <ampl.fa>   Amplicons
+    <in.*>      File with unpaired reads (default: stdin)
+    <in1.*>     File with #1 mates
+    <in2.*>     File with #2 mates
 
-    <out.*>         Trimmed unpaired reads (default: stdout)
-    <out1.*>        Trimmed #1 mates
-    <out2.*>        Trimmed #2 mates
-    <err.*>         Unmatched unpaired reads (default: <out.*>)
-    <err1.*>        Unmatched #1 mates (default: <out1.*>)
-    <err2.*>        Unmatched #2 mates (default: <out2.*>)
+    <out.*>     Trimmed unpaired reads (default: stdout)
+    <out1.*>    Trimmed #1 mates
+    <out2.*>    Trimmed #2 mates
+    <err.*>     Unmatched unpaired reads (default: <out.*>)
+    <err1.*>    Unmatched #1 mates (default: <out1.*>)
+    <err2.*>    Unmatched #2 mates (default: <out2.*>)
 
 Options:
-    -k INT          K-mer size (default: 13)
-    -t FLOAT        Alignment score ratio threshold (default: 0.5)
-    -m FLOAT        Mismatch penalty (default: -1.4)
-    -g FLOAT        Gap penalty (default: -1.4)
+    -k INT      K-mer size (default: 13)
+    -t FLOAT    Alignment score ratio threshold (default: 0.5)
+    -m FLOAT    Mismatch penalty (default: -1.4)
+    -g FLOAT    Gap penalty (default: -1.4)
+    -d INT      Max number of degenerate nucleotides N in a k-mer (default: 2)
+    -b          Trim paired reads from both sides
 
 Other:
     -h/--help       Show this message
@@ -126,6 +128,8 @@ Other:
     }
     atlas::trim_parameters::mismatch_penalty = parser.get_value<float>("m", "-m MISMATCH", 1, -1.4);
     atlas::trim_parameters::gap_penalty = parser.get_value<float>("g", "-g GAP", 1, -1.4);
+    atlas::trim_parameters::degenerate_nucleotides_count = parser.get_value<size_t>("d", "-d INT", 1, 2);
+    atlas::trim_parameters::paired_local = parser.flag_up("b");
 
     std::istream *amplicons_stream = parser.get_istream("a", "<ampl.fa>", 1);
     auto amplicons = atlas::create_amplicon_pairs(*amplicons_stream);

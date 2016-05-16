@@ -30,11 +30,11 @@ amplicon_index::amplicon_index(std::istream& in) {
             return;
         }
 
-        std::set<int> amplicons;
+        std::vector<int> amplicons;
         int amplicon_number;
         in >> amplicon_number;
         while (amplicon_number) {
-            amplicons.insert(amplicon_number);
+            amplicons.push_back(amplicon_number);
             in >> amplicon_number;
         }
 
@@ -51,7 +51,7 @@ void amplicon_index::add_amplicon(std::string const& seq, int amplicon_number) {
 
     for (size_t i = k_ - 1; i < seq.size(); ++i) {
         kmer = 4 * (kmer % modulo_) + get_nt_number(seq[i]);
-        dict_[kmer].insert(amplicon_number);
+        dict_[kmer].push_back(amplicon_number);
     }
 }
 
@@ -59,7 +59,7 @@ bool amplicon_index::contains(u64 kmer) const {
     return dict_.find(kmer) != dict_.end();
 }
 
-std::set<int> const& amplicon_index::get_all_amplicons(u64 kmer) const {
+std::vector<int> const& amplicon_index::get_all_amplicons(u64 kmer) const {
     return dict_.find(kmer)->second;
 }
 
